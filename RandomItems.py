@@ -366,7 +366,11 @@ class Main:
                 addonfile = os.path.join(addonpath, item, 'addon.xml')
                 if os.path.exists(addonfile):
                     # find addon id
-                    addonfilecontents = xmltree.parse(addonfile).getroot()
+                    try:
+                        addonfilecontents = xmltree.parse(addonfile).getroot()
+                    except:
+                        # don't error on invalid addon.xml files
+                        continue
                     for element in addonfilecontents.getiterator():
                        if element.tag == "addon":
                            addonid = element.attrib.get('id')
