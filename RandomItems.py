@@ -88,48 +88,47 @@ class Main:
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         # separate the records
         json_response = simplejson.loads(json_query)
-        if json_response.has_key('result'):
-            if (json_response['result'] != None) and (json_response['result'].has_key('movies')):
-                json_response = json_response['result']['movies']
-                # get total value
-                total = str( len( json_response ) )
-                # enumerate thru our records
-                count = 0
-                while count < self.LIMIT:
-                    count += 1
-                    # check if we don't run out of items before LIMIT is reached
-                    if len( json_response ) == 0:
-                        return
-                    # select a random item
-                    item = random.choice( json_response )
-                    # remove the item from our list
-                    json_response.remove( item )
-                    # find values
-                    if self.UNPLAYED == "True":
-                        playcount = item['playcount']
-                        if playcount > 0:
-                            count = count - 1
-                            continue
-                    title = item['title']
-                    rating = str(round(float(item['rating']),1))
-                    year = str(item['year'])
-                    plot = item['plot']
-                    runtime = item['runtime']
-                    path = item['file']
-                    thumb = item['thumbnail']
-                    trailer = item['trailer']
-                    fanart = item['fanart']
-                    # set our properties
-                    self.WINDOW.setProperty( "RandomMovie.%d.Title"       % ( count ), title )
-                    self.WINDOW.setProperty( "RandomMovie.%d.Rating"      % ( count ), rating )
-                    self.WINDOW.setProperty( "RandomMovie.%d.Year"        % ( count ), year)
-                    self.WINDOW.setProperty( "RandomMovie.%d.Plot"        % ( count ), plot )
-                    self.WINDOW.setProperty( "RandomMovie.%d.RunningTime" % ( count ), runtime )
-                    self.WINDOW.setProperty( "RandomMovie.%d.Path"        % ( count ), path )
-                    self.WINDOW.setProperty( "RandomMovie.%d.Trailer"     % ( count ), trailer )
-                    self.WINDOW.setProperty( "RandomMovie.%d.Fanart"      % ( count ), fanart )
-                    self.WINDOW.setProperty( "RandomMovie.%d.Thumb"       % ( count ), thumb )
-                    self.WINDOW.setProperty( "RandomMovie.Count"          , total )
+        if json_response.has_key('result') and (json_response['result'].has_key('movies')):
+            json_response = json_response['result']['movies']
+            # get total value
+            total = str( len( json_response ) )
+            # enumerate thru our records
+            count = 0
+            while count < self.LIMIT:
+                count += 1
+                # check if we don't run out of items before LIMIT is reached
+                if len( json_response ) == 0:
+                    return
+                # select a random item
+                item = random.choice( json_response )
+                # remove the item from our list
+                json_response.remove( item )
+                # find values
+                if self.UNPLAYED == "True":
+                    playcount = item['playcount']
+                    if playcount > 0:
+                        count = count - 1
+                        continue
+                title = item['title']
+                rating = str(round(float(item['rating']),1))
+                year = str(item['year'])
+                plot = item['plot']
+                runtime = item['runtime']
+                path = item['file']
+                thumb = item['thumbnail']
+                trailer = item['trailer']
+                fanart = item['fanart']
+                # set our properties
+                self.WINDOW.setProperty( "RandomMovie.%d.Title"       % ( count ), title )
+                self.WINDOW.setProperty( "RandomMovie.%d.Rating"      % ( count ), rating )
+                self.WINDOW.setProperty( "RandomMovie.%d.Year"        % ( count ), year)
+                self.WINDOW.setProperty( "RandomMovie.%d.Plot"        % ( count ), plot )
+                self.WINDOW.setProperty( "RandomMovie.%d.RunningTime" % ( count ), runtime )
+                self.WINDOW.setProperty( "RandomMovie.%d.Path"        % ( count ), path )
+                self.WINDOW.setProperty( "RandomMovie.%d.Trailer"     % ( count ), trailer )
+                self.WINDOW.setProperty( "RandomMovie.%d.Fanart"      % ( count ), fanart )
+                self.WINDOW.setProperty( "RandomMovie.%d.Thumb"       % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomMovie.Count"          , total )
 
     def _fetch_episode_info( self ):
         # query the database
@@ -138,50 +137,49 @@ class Main:
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         # separate the records
         json_response = simplejson.loads(json_query)
-        if json_response.has_key('result'):
-            if (json_response['result'] != None) and (json_response['result'].has_key('episodes')):
-                json_response = json_response['result']['episodes']
-                # get total value
-                total = str( len( json_response ) )
-                # enumerate thru our records
-                count = 0
-                while count < self.LIMIT:
-                    count += 1
-                    # check if we don't run out of items before LIMIT is reached
-                    if len( json_response ) == 0:
-                        return
-                    # select a random item
-                    item = random.choice( json_response )
-                    # remove the item from our list
-                    json_response.remove( item )
-                    # find values
-                    if self.UNPLAYED == "True":
-                        playcount = item['playcount']
-                        if playcount > 0:
-                            count = count - 1
-                            continue
-                    title = item['title']
-                    showtitle = item['showtitle']
-                    season = "%.2d" % float(item['season'])
-                    episode = "%.2d" % float(item['episode'])
-                    rating = str(round(float(item['rating']),1))
-                    plot = item['plot']
-                    path = item['file']
-                    thumb = item['thumbnail']
-                    fanart = item['fanart']
-                    episodeno = "s%se%s" % ( season,  episode, )
-                    # set our properties
-                    self.WINDOW.setProperty( "RandomEpisode.%d.ShowTitle"     % ( count ), showtitle )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeTitle"  % ( count ), title )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeNo"     % ( count ), episodeno )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeSeason" % ( count ), season )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeNumber" % ( count ), episode )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.Rating"        % ( count ), rating )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.Plot"          % ( count ), plot )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.Path"          % ( count ), path )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.Fanart"        % ( count ), fanart )
-                    self.WINDOW.setProperty( "RandomEpisode.%d.Thumb"         % ( count ), thumb )
-                    self.WINDOW.setProperty( "RandomEpisode.Count"            , total )
+        if json_response.has_key('result') and (json_response['result'].has_key('episodes')):
+            json_response = json_response['result']['episodes']
+            # get total value
+            total = str( len( json_response ) )
+            # enumerate thru our records
+            count = 0
+            while count < self.LIMIT:
+                count += 1
+                # check if we don't run out of items before LIMIT is reached
+                if len( json_response ) == 0:
+                    return
+                # select a random item
+                item = random.choice( json_response )
+                # remove the item from our list
+                json_response.remove( item )
+                # find values
+                if self.UNPLAYED == "True":
+                    playcount = item['playcount']
+                    if playcount > 0:
+                        count = count - 1
+                        continue
+                title = item['title']
+                showtitle = item['showtitle']
+                season = "%.2d" % float(item['season'])
+                episode = "%.2d" % float(item['episode'])
+                rating = str(round(float(item['rating']),1))
+                plot = item['plot']
+                path = item['file']
+                thumb = item['thumbnail']
+                fanart = item['fanart']
+                episodeno = "s%se%s" % ( season,  episode, )
+                # set our properties
+                self.WINDOW.setProperty( "RandomEpisode.%d.ShowTitle"     % ( count ), showtitle )
+                self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeTitle"  % ( count ), title )
+                self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeNo"     % ( count ), episodeno )
+                self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeSeason" % ( count ), season )
+                self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeNumber" % ( count ), episode )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Rating"        % ( count ), rating )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Plot"          % ( count ), plot )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Path"          % ( count ), path )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Fanart"        % ( count ), fanart )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Thumb"         % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomEpisode.Count"            , total )
 
     def _fetch_musicvideo_info( self ):
         # query the database
@@ -189,46 +187,45 @@ class Main:
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         # separate the records
         json_response = simplejson.loads(json_query)
-        if json_response.has_key('result'):
-            if (json_response['result'] != None) and (json_response['result'].has_key('musicvideos')):
-                json_response = json_response['result']['musicvideos']
-                # get total value
-                total = str( len( json_response ) )
-                # enumerate thru our records
-                count = 0
-                while count < self.LIMIT:
-                    count += 1
-                    # check if we don't run out of items before LIMIT is reached
-                    if len( json_response ) == 0:
-                        return
-                    # select a random item
-                    item = random.choice( json_response )
-                    # remove the item from our list
-                    json_response.remove( item )
-                    # find values
-                    if self.UNPLAYED == "True":
-                        playcount = item['playcount']
-                        if playcount > 0:
-                            count = count - 1
-                            continue
-                    title = item['title']
-                    year = str(item['year'])
-                    plot = item['plot']
-                    runtime = item['runtime']
-                    path = item['file']
-                    artist = item['artist']
-                    thumb = item['thumbnail']
-                    fanart = item['fanart']
-                    # set our properties
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.Title"       % ( count ), title )
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.Year"        % ( count ), year)
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.Plot"        % ( count ), plot )
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.RunningTime" % ( count ), runtime )
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.Path"        % ( count ), path )
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.Fanart"      % ( count ), fanart )
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), artist )
-                    self.WINDOW.setProperty( "RandomMusicVideo.%d.Thumb"       % ( count ), thumb )
-                    self.WINDOW.setProperty( "RandomMusicVideo.Count"          , total )
+        if json_response.has_key('result') and (json_response['result'].has_key('musicvideos')):
+            json_response = json_response['result']['musicvideos']
+            # get total value
+            total = str( len( json_response ) )
+            # enumerate thru our records
+            count = 0
+            while count < self.LIMIT:
+                count += 1
+                # check if we don't run out of items before LIMIT is reached
+                if len( json_response ) == 0:
+                    return
+                # select a random item
+                item = random.choice( json_response )
+                # remove the item from our list
+                json_response.remove( item )
+                # find values
+                if self.UNPLAYED == "True":
+                    playcount = item['playcount']
+                    if playcount > 0:
+                        count = count - 1
+                        continue
+                title = item['title']
+                year = str(item['year'])
+                plot = item['plot']
+                runtime = item['runtime']
+                path = item['file']
+                artist = item['artist']
+                thumb = item['thumbnail']
+                fanart = item['fanart']
+                # set our properties
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Title"       % ( count ), title )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Year"        % ( count ), year)
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Plot"        % ( count ), plot )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.RunningTime" % ( count ), runtime )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Path"        % ( count ), path )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Fanart"      % ( count ), fanart )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), artist )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Thumb"       % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomMusicVideo.Count"          , total )
 
     def _fetch_album_info( self ):
         # query the database
@@ -236,79 +233,79 @@ class Main:
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         # separate the records
         json_response = simplejson.loads(json_query)
-        if json_response.has_key('result'):
-            if (json_response['result'] != None) and (json_response['result'].has_key('albums')):
-                json_response = json_response['result']['albums']
-                # get total value
-                total = str( len( json_response ) )
-                # enumerate thru our records
-                count = 0
-                while count < self.LIMIT:
-                    count += 1
-                    # check if we don't run out of items before LIMIT is reached
-                    if len( json_response ) == 0:
-                        return
-                    # select a random item
-                    item = random.choice( json_response )
-                    # remove the item from our list
-                    json_response.remove( item )
-                    # find values
-                    title = item['title']
-                    description = item['description']
-                    rating = str(item['rating'])
-                    if rating == '48':
-                        rating = ""
-                    year = str(item['year'])
-                    artist = item['artist']
-                    path = 'XBMC.RunScript(' + __addonid__ + ',albumid=' + str(item['albumid']) + ')'
-                    fanart = item['fanart']
-                    thumb = item['thumbnail']
-                    # set our properties
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Title"  % ( count ), title )
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Rating" % ( count ), rating )
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Year"   % ( count ), year )
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Artist" % ( count ), artist )
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Path"   % ( count ), path )
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Fanart" % ( count ), fanart )
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Thumb"  % ( count ), thumb )
-                    self.WINDOW.setProperty( "RandomAlbum.%d.Album_Description"  % ( count ), description )
-                    self.WINDOW.setProperty( "RandomAlbum.Count"     , total )
+
+        if json_response.has_key('result') and (json_response['result'].has_key('albums')):
+            json_response = json_response['result']['albums']
+            # get total value
+            total = str( len( json_response ) )
+            # enumerate thru our records
+            count = 0
+            while count < self.LIMIT:
+                count += 1
+                # check if we don't run out of items before LIMIT is reached
+                if len( json_response ) == 0:
+                    return
+                # select a random item
+                item = random.choice( json_response )
+                # remove the item from our list
+                json_response.remove( item )
+                # find values
+                title = item['title']
+                description = item['description']
+                rating = str(item['rating'])
+                if rating == '48':
+                    rating = ""
+                year = str(item['year'])
+                artist = item['artist']
+                path = 'XBMC.RunScript(' + __addonid__ + ',albumid=' + str(item['albumid']) + ')'
+                fanart = item['fanart']
+                thumb = item['thumbnail']
+                # set our properties
+                self.WINDOW.setProperty( "RandomAlbum.%d.Title"  % ( count ), title )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Rating" % ( count ), rating )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Year"   % ( count ), year )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Artist" % ( count ), artist )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Path"   % ( count ), path )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Fanart" % ( count ), fanart )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Thumb"  % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Album_Description"  % ( count ), description )
+                self.WINDOW.setProperty( "RandomAlbum.Count"     , total )
 
     def _fetch_artist_info( self ):
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": {"properties": ["genre", "description", "fanart", "thumbnail"], "sort": { "method": "label" } }, "id": 1}')
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         json_response = simplejson.loads(json_query)
-        if json_response.has_key('result'):
-            if (json_response['result'] != None) and (json_response['result'].has_key('artists')):
-                json_response = json_response['result']['artists']
-                # get total value
-                total = str( len( json_response ) )
-                # enumerate thru our records
-                count = 0
-                while count < self.LIMIT:
-                    count += 1
-                    # check if we don't run out of items before LIMIT is reached
-                    if len( json_response ) == 0:
-                        return
-                    # select a random item
-                    item = random.choice( json_response )
-                    # remove the item from our list
-                    json_response.remove( item )
-                    # find values
-                    description = item['description']
-                    genre = str(item['genre'])
-                    artist = item['label']
-                    path = 'musicdb://2/' + str(item['artistid']) + '/'
-                    fanart = item['fanart']
-                    thumb = item['thumbnail']
-                    # set our properties
-                    self.WINDOW.setProperty( "RandomArtist.%d.Title"  % ( count ), artist )
-                    self.WINDOW.setProperty( "RandomArtist.%d.Genre" % ( count ), genre )
-                    self.WINDOW.setProperty( "RandomArtist.%d.Path"   % ( count ), path )
-                    self.WINDOW.setProperty( "RandomArtist.%d.Fanart" % ( count ), fanart )
-                    self.WINDOW.setProperty( "RandomArtist.%d.Thumb"  % ( count ), thumb )
-                    self.WINDOW.setProperty( "RandomArtist.%d.Artist_Description"  % ( count ), description )
-                    self.WINDOW.setProperty( "RandomArtist.Count"     , total )
+
+        if json_response.has_key('result') and (json_response['result'].has_key('artists')):
+            json_response = json_response['result']['artists']
+            # get total value
+            total = str( len( json_response ) )
+            # enumerate thru our records
+            count = 0
+            while count < self.LIMIT:
+                count += 1
+                # check if we don't run out of items before LIMIT is reached
+                if len( json_response ) == 0:
+                    return
+                # select a random item
+                item = random.choice( json_response )
+                # remove the item from our list
+                json_response.remove( item )
+                # find values
+                description = item['description']
+                genre = str(item['genre'])
+                artist = item['label']
+                path = 'musicdb://2/' + str(item['artistid']) + '/'
+                fanart = item['fanart']
+                thumb = item['thumbnail']
+                # set our properties
+                self.WINDOW.setProperty( "RandomArtist.%d.Title"  % ( count ), artist )
+                self.WINDOW.setProperty( "RandomArtist.%d.Genre" % ( count ), genre )
+                self.WINDOW.setProperty( "RandomArtist.%d.Path"   % ( count ), path )
+                self.WINDOW.setProperty( "RandomArtist.%d.Fanart" % ( count ), fanart )
+                self.WINDOW.setProperty( "RandomArtist.%d.Thumb"  % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomArtist.%d.Artist_Description"  % ( count ), description )
+                self.WINDOW.setProperty( "RandomArtist.Count"     , total )
 
     def _fetch_song_info( self ):
         # query the database
@@ -316,46 +313,45 @@ class Main:
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         # separate the records
         json_response = simplejson.loads(json_query)
-        if json_response.has_key('result'):
-            if (json_response['result'] != None) and (json_response['result'].has_key('songs')):
-                json_response = json_response['result']['songs']
-                # get total value
-                total = str( len( json_response ) )
-                # enumerate thru our records
-                count = 0
-                while count < self.LIMIT:
-                    count += 1
-                    # check if we don't run out of items before LIMIT is reached
-                    if len( json_response ) == 0:
-                        return
-                    # select a random item
-                    item = random.choice( json_response )
-                    # remove the item from our list
-                    json_response.remove( item )
-                    # find values
-                    if self.UNPLAYED == "True":
-                        playcount = item['playcount']
-                        if playcount > 0:
-                            count = count - 1
-                            continue
-                    title = item['title']
-                    rating = str(int(item['rating'])-48)
-                    year = str(item['year'])
-                    artist = item['artist']
-                    album = item['album']
-                    path = item['file']
-                    fanart = item['fanart']
-                    thumb = item['thumbnail']
-                    # set our properties
-                    self.WINDOW.setProperty( "RandomSong.%d.Title"  % ( count ), title )
-                    self.WINDOW.setProperty( "RandomSong.%d.Rating" % ( count ), rating )
-                    self.WINDOW.setProperty( "RandomSong.%d.Year"   % ( count ), year )
-                    self.WINDOW.setProperty( "RandomSong.%d.Artist" % ( count ), artist )
-                    self.WINDOW.setProperty( "RandomSong.%d.Album"  % ( count ), album )
-                    self.WINDOW.setProperty( "RandomSong.%d.Path"   % ( count ), path )
-                    self.WINDOW.setProperty( "RandomSong.%d.Fanart" % ( count ), fanart )
-                    self.WINDOW.setProperty( "RandomSong.%d.Thumb"  % ( count ), thumb )
-                    self.WINDOW.setProperty( "RandomSong.Count"     , total )
+        if json_response.has_key('result') and (json_response['result'].has_key('songs')):
+            json_response = json_response['result']['songs']
+            # get total value
+            total = str( len( json_response ) )
+            # enumerate thru our records
+            count = 0
+            while count < self.LIMIT:
+                count += 1
+                # check if we don't run out of items before LIMIT is reached
+                if len( json_response ) == 0:
+                    return
+                # select a random item
+                item = random.choice( json_response )
+                # remove the item from our list
+                json_response.remove( item )
+                # find values
+                if self.UNPLAYED == "True":
+                    playcount = item['playcount']
+                    if playcount > 0:
+                        count = count - 1
+                        continue
+                title = item['title']
+                rating = str(int(item['rating'])-48)
+                year = str(item['year'])
+                artist = item['artist']
+                album = item['album']
+                path = item['file']
+                fanart = item['fanart']
+                thumb = item['thumbnail']
+                # set our properties
+                self.WINDOW.setProperty( "RandomSong.%d.Title"  % ( count ), title )
+                self.WINDOW.setProperty( "RandomSong.%d.Rating" % ( count ), rating )
+                self.WINDOW.setProperty( "RandomSong.%d.Year"   % ( count ), year )
+                self.WINDOW.setProperty( "RandomSong.%d.Artist" % ( count ), artist )
+                self.WINDOW.setProperty( "RandomSong.%d.Album"  % ( count ), album )
+                self.WINDOW.setProperty( "RandomSong.%d.Path"   % ( count ), path )
+                self.WINDOW.setProperty( "RandomSong.%d.Fanart" % ( count ), fanart )
+                self.WINDOW.setProperty( "RandomSong.%d.Thumb"  % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomSong.Count"     , total )
 
     def _fetch_addon_info( self ):
         # initialize our list
@@ -418,14 +414,13 @@ class Main:
         # separate the records
         json_response = simplejson.loads(json_query)
         # enumerate thru our records
-        if json_response.has_key('result'):
-            if (json_response['result'] != None) and (json_response['result'].has_key('songs')):
-                for item in json_response['result']['songs']:
-                    song = item['file']
-                    fanart = item['fanart']
-                    listitem = xbmcgui.ListItem()
-                    listitem.setProperty( "fanart_image", fanart )
-                    playlist.add( url=song, listitem=listitem )
+        if json_response.has_key('result') and (json_response['result'].has_key('songs')):
+            for item in json_response['result']['songs']:
+                song = item['file']
+                fanart = item['fanart']
+                listitem = xbmcgui.ListItem()
+                listitem.setProperty( "fanart_image", fanart )
+                playlist.add( url=song, listitem=listitem )
         # play the playlist
         xbmc.Player().play( playlist )
 
