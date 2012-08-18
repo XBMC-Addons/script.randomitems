@@ -264,8 +264,7 @@ class Main:
                 self.WINDOW.setProperty( "RandomAlbum.%d.Title"  % ( count ), title )
                 self.WINDOW.setProperty( "RandomAlbum.%d.Rating" % ( count ), rating )
                 self.WINDOW.setProperty( "RandomAlbum.%d.Year"   % ( count ), year )
-                # This has been changed to an array. Do we want to display all of them?
-                self.WINDOW.setProperty( "RandomAlbum.%d.Artist" % ( count ), artist[0] )
+                self.WINDOW.setProperty( "RandomAlbum.%d.Artist" % ( count ), self._array_tostring(artist) )
                 self.WINDOW.setProperty( "RandomAlbum.%d.Path"   % ( count ), path )
                 self.WINDOW.setProperty( "RandomAlbum.%d.Fanart" % ( count ), fanart )
                 self.WINDOW.setProperty( "RandomAlbum.%d.Thumb"  % ( count ), thumb )
@@ -347,8 +346,7 @@ class Main:
                 self.WINDOW.setProperty( "RandomSong.%d.Title"  % ( count ), title )
                 self.WINDOW.setProperty( "RandomSong.%d.Rating" % ( count ), rating )
                 self.WINDOW.setProperty( "RandomSong.%d.Year"   % ( count ), year )
-                # This has been changed to an array. Do we want to display all of them?
-                self.WINDOW.setProperty( "RandomSong.%d.Artist" % ( count ), artist[0] )
+                self.WINDOW.setProperty( "RandomSong.%d.Artist" % ( count ), self._array_tostring(artist) )
                 self.WINDOW.setProperty( "RandomSong.%d.Album"  % ( count ), album )
                 self.WINDOW.setProperty( "RandomSong.%d.Path"   % ( count ), path )
                 self.WINDOW.setProperty( "RandomSong.%d.Fanart" % ( count ), fanart )
@@ -429,6 +427,12 @@ class Main:
                 playlist.add( url=song, listitem=listitem )
         # play the playlist
         xbmc.Player().play( playlist )
+        
+    def _array_tostring(self, data):
+        string = ''
+        for item in data:
+            string += '%s / ' %item
+        return string.rstrip(' / ')
 
 if ( __name__ == "__main__" ):
         log('script version %s started' % __addonversion__)
