@@ -223,7 +223,7 @@ class Main:
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.RunningTime" % ( count ), runtime )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Path"        % ( count ), path )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Fanart"      % ( count ), fanart )
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), artist )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), " / ".join( artist ) )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Thumb"       % ( count ), thumb )
                 self.WINDOW.setProperty( "RandomMusicVideo.Count"          , total )
 
