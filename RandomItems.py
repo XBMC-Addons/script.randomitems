@@ -293,7 +293,7 @@ class Main:
                 json_response.remove( item )
                 # find values
                 description = item['description']
-                genre = str(item['genre'])
+                genre = item['genre']
                 artist = item['label']
                 path = 'musicdb://2/' + str(item['artistid']) + '/'
                 fanart = item['fanart']
