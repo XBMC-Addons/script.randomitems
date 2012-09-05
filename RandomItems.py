@@ -298,7 +298,7 @@ class Main:
                 thumb = item['thumbnail']
                 # set our properties
                 self.WINDOW.setProperty( "RandomArtist.%d.Title"  % ( count ), artist )
-                self.WINDOW.setProperty( "RandomArtist.%d.Genre" % ( count ), genre )
+                self.WINDOW.setProperty( "RandomArtist.%d.Genre" % ( count ), " / ".join( genre ) )
                 self.WINDOW.setProperty( "RandomArtist.%d.Path"   % ( count ), path )
                 self.WINDOW.setProperty( "RandomArtist.%d.Fanart" % ( count ), fanart )
                 self.WINDOW.setProperty( "RandomArtist.%d.Thumb"  % ( count ), thumb )
