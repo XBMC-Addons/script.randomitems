@@ -84,50 +84,25 @@ class Main:
 
     def _fetch_movie_info( self ):
         # query the database
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"properties": ["title", "playcount", "year", "plot", "runtime", "fanart", "thumbnail", "file", "trailer", "rating"] }, "id": 1}')
+        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"properties": ["title", "playcount", "year", "plot", "runtime", "fanart", "thumbnail", "file", "trailer", "rating"], "sort": {"method": "unsorted" }, "limits": {"end": %d} }, "id": 1}' %self.LIMIT)
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         # separate the records
         json_response = simplejson.loads(json_query)
         if json_response.has_key('result') and json_response['result'] != None and json_response['result'].has_key('movies'):
-            json_response = json_response['result']['movies']
-            # get total value
-            total = str( len( json_response ) )
-            # enumerate thru our records
             count = 0
-            while count < self.LIMIT:
+            total = str(len(json_response))
+            for item in json_response['result']['movies']:
                 count += 1
-                # check if we don't run out of items before LIMIT is reached
-                if len( json_response ) == 0:
-                    return
-                # select a random item
-                item = random.choice( json_response )
-                # remove the item from our list
-                json_response.remove( item )
-                # find values
-                if self.UNPLAYED == "True":
-                    playcount = item['playcount']
-                    if playcount > 0:
-                        count = count - 1
-                        continue
-                title = item['title']
-                rating = str(round(float(item['rating']),1))
-                year = str(item['year'])
-                plot = item['plot']
-                runtime = item['runtime']
-                path = item['file']
-                thumb = item['thumbnail']
-                trailer = item['trailer']
-                fanart = item['fanart']
                 # set our properties
-                self.WINDOW.setProperty( "RandomMovie.%d.Title"       % ( count ), title )
-                self.WINDOW.setProperty( "RandomMovie.%d.Rating"      % ( count ), rating )
-                self.WINDOW.setProperty( "RandomMovie.%d.Year"        % ( count ), year)
-                self.WINDOW.setProperty( "RandomMovie.%d.Plot"        % ( count ), plot )
-                self.WINDOW.setProperty( "RandomMovie.%d.RunningTime" % ( count ), runtime )
-                self.WINDOW.setProperty( "RandomMovie.%d.Path"        % ( count ), path )
-                self.WINDOW.setProperty( "RandomMovie.%d.Trailer"     % ( count ), trailer )
-                self.WINDOW.setProperty( "RandomMovie.%d.Fanart"      % ( count ), fanart )
-                self.WINDOW.setProperty( "RandomMovie.%d.Thumb"       % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomMovie.%d.Title"       % ( count ), item['title'] )
+                self.WINDOW.setProperty( "RandomMovie.%d.Rating"      % ( count ), str(round(float(item['rating']),1)) )
+                self.WINDOW.setProperty( "RandomMovie.%d.Year"        % ( count ), str(item['year']))
+                self.WINDOW.setProperty( "RandomMovie.%d.Plot"        % ( count ), item['plot'] )
+                self.WINDOW.setProperty( "RandomMovie.%d.RunningTime" % ( count ), item['runtime'] )
+                self.WINDOW.setProperty( "RandomMovie.%d.Path"        % ( count ), item['file'] )
+                self.WINDOW.setProperty( "RandomMovie.%d.Trailer"     % ( count ), item['trailer'] )
+                self.WINDOW.setProperty( "RandomMovie.%d.Fanart"      % ( count ), item['fanart'] )
+                self.WINDOW.setProperty( "RandomMovie.%d.Thumb"       % ( count ), item['thumbnail'] )
                 self.WINDOW.setProperty( "RandomMovie.Count"          , total )
 
     def _fetch_episode_info( self ):
