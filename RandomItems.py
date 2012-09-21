@@ -202,38 +202,21 @@ class Main:
                 self.WINDOW.setProperty( "RandomAlbum.Count"     , total )
 
     def _fetch_artist_info( self ):
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": {"properties": ["genre", "description", "fanart", "thumbnail"], "sort": { "method": "label" } }, "id": 1}')
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
-        json_response = simplejson.loads(json_query)
-        if json_response.has_key('result') and json_response['result'] != None and json_response['result'].has_key('artists'):
-            json_response = json_response['result']['artists']
-            # get total value
-            total = str( len( json_response ) )
-            # enumerate thru our records
+        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": {"properties": ["genre", "description", "fanart", "thumbnail"], "sort": {"method": "random"}, "limits": {"end": %d}}, "id": 1}'  %self.LIMIT)
+        json_response = unicode(json_query, 'utf-8', errors='ignore')
+        jsonobject = simplejson.loads(json_response)
+        if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('artists'):
             count = 0
-            while count < self.LIMIT:
+            total = str(len(jsonobject))
+            for item in jsonobject['result']['artists']:
                 count += 1
-                # check if we don't run out of items before LIMIT is reached
-                if len( json_response ) == 0:
-                    return
-                # select a random item
-                item = random.choice( json_response )
-                # remove the item from our list
-                json_response.remove( item )
-                # find values
-                description = item['description']
-                genre = item['genre']
-                artist = item['label']
                 path = 'musicdb://2/' + str(item['artistid']) + '/'
-                fanart = item['fanart']
-                thumb = item['thumbnail']
-                # set our properties
-                self.WINDOW.setProperty( "RandomArtist.%d.Title"  % ( count ), artist )
-                self.WINDOW.setProperty( "RandomArtist.%d.Genre" % ( count ), " / ".join( genre ) )
+                self.WINDOW.setProperty( "RandomArtist.%d.Title"  % ( count ), item['label'] )
+                self.WINDOW.setProperty( "RandomArtist.%d.Genre" % ( count ), " / ".join( item['genre'] ) )
                 self.WINDOW.setProperty( "RandomArtist.%d.Path"   % ( count ), path )
-                self.WINDOW.setProperty( "RandomArtist.%d.Fanart" % ( count ), fanart )
-                self.WINDOW.setProperty( "RandomArtist.%d.Thumb"  % ( count ), thumb )
-                self.WINDOW.setProperty( "RandomArtist.%d.Artist_Description"  % ( count ), description )
+                self.WINDOW.setProperty( "RandomArtist.%d.Fanart" % ( count ), item['fanart'] )
+                self.WINDOW.setProperty( "RandomArtist.%d.Thumb"  % ( count ), item['thumbnail'] )
+                self.WINDOW.setProperty( "RandomArtist.%d.Artist_Description"  % ( count ), item['description'] )
                 self.WINDOW.setProperty( "RandomArtist.Count"     , total )
 
     def _fetch_song_info( self ):
