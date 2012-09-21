@@ -67,7 +67,7 @@ class Main:
         self._parse_argv()
         # check if we were executed internally
         if self.ALBUMID:
-            self._Play_Album( self.ALBUMID )
+            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "albumid": %d } }, "id": 1 }' % int(self.ALBUMID))
         else:
             # clear properties
             self._clear_properties()
@@ -379,27 +379,6 @@ class Main:
             self.WINDOW.setProperty( "RandomAddon.%d.Thumb"   % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('icon') )
             self.WINDOW.setProperty( "RandomAddon.%d.Type"    % ( count ), addonid[1] )
             self.WINDOW.setProperty( "RandomAddon.Count"      , total )
-
-    def _Play_Album( self, ID ):
-        # create a playlist
-        playlist = xbmc.PlayList(0)
-        # clear the playlist
-        playlist.clear()
-        # query the database
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetSongs", "params": {"properties": ["file", "fanart"], "albumid":%s }, "id": 1}' % ID)
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
-        # separate the records
-        json_response = simplejson.loads(json_query)
-        # enumerate thru our records
-        if json_response.has_key('result') and json_response['result'] != None and json_response['result'].has_key('songs'):
-            for item in json_response['result']['songs']:
-                song = item['file']
-                fanart = item['fanart']
-                listitem = xbmcgui.ListItem()
-                listitem.setProperty( "fanart_image", fanart )
-                playlist.add( url=song, listitem=listitem )
-        # play the playlist
-        xbmc.Player().play( playlist )
 
 if ( __name__ == "__main__" ):
         log('script version %s started' % __addonversion__)
