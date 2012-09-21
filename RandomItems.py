@@ -158,48 +158,24 @@ class Main:
 
     def _fetch_musicvideo_info( self ):
         # query the database
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMusicVideos", "params": {"properties": ["title", "artist", "playcount", "year", "plot", "runtime", "fanart", "thumbnail", "file"] }, "id": 1}')
+        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMusicVideos", "params": {"properties": ["title", "artist", "playcount", "year", "plot", "runtime", "fanart", "thumbnail", "file"] "sort": {"method": "random"}, "limits": {"end": %d}}, "id": 1}'  %self.LIMIT)
         json_query = unicode(json_query, 'utf-8', errors='ignore')
         # separate the records
         json_response = simplejson.loads(json_query)
         if json_response.has_key('result') and json_response['result'] != None and json_response['result'].has_key('musicvideos'):
-            json_response = json_response['result']['musicvideos']
-            # get total value
-            total = str( len( json_response ) )
-            # enumerate thru our records
             count = 0
-            while count < self.LIMIT:
+            total = str(len(json_response))
+            for item in json_response['result']['musicvideos']:
                 count += 1
-                # check if we don't run out of items before LIMIT is reached
-                if len( json_response ) == 0:
-                    return
-                # select a random item
-                item = random.choice( json_response )
-                # remove the item from our list
-                json_response.remove( item )
-                # find values
-                if self.UNPLAYED == "True":
-                    playcount = item['playcount']
-                    if playcount > 0:
-                        count = count - 1
-                        continue
-                title = item['title']
-                year = str(item['year'])
-                plot = item['plot']
-                runtime = item['runtime']
-                path = item['file']
-                artist = item['artist']
-                thumb = item['thumbnail']
-                fanart = item['fanart']
                 # set our properties
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Title"       % ( count ), title )
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Year"        % ( count ), year)
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Plot"        % ( count ), plot )
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.RunningTime" % ( count ), runtime )
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Path"        % ( count ), path )
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Fanart"      % ( count ), fanart )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Title"       % ( count ), item['title'] )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Year"        % ( count ), str(item['year']))
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Plot"        % ( count ), item['plot'] )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.RunningTime" % ( count ), item['runtime'] )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Path"        % ( count ), item['file'] )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Fanart"      % ( count ), item['fanart'] )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), " / ".join( artist ) )
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Thumb"       % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Thumb"       % ( count ), item['thumbnail'] )
                 self.WINDOW.setProperty( "RandomMusicVideo.Count"          , total )
 
     def _fetch_album_info( self ):
