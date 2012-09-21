@@ -106,54 +106,31 @@ class Main:
                 self.WINDOW.setProperty( "RandomMovie.Count"          , total )
 
     def _fetch_episode_info( self ):
-        # query the database
-        tvshowid = 2
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": { "properties": ["title", "playcount", "season", "episode", "showtitle", "plot", "fanart", "thumbnail", "file", "rating"] }, "id": 1}')
-        json_query = unicode(json_query, 'utf-8', errors='ignore')
-        # separate the records
-        json_response = simplejson.loads(json_query)
-        if json_response.has_key('result') and json_response['result'] != None and json_response['result'].has_key('episodes'):
-            json_response = json_response['result']['episodes']
-            # get total value
-            total = str( len( json_response ) )
-            # enumerate thru our records
+        if self.UNPLAYED == "True":
+            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": { "properties": ["title", "playcount", "season", "episode", "showtitle", "plot", "fanart", "thumbnail", "file", "rating"], "filter": {"field": "playcount", "operator": "greaterthan", "value": 0}"sort": {"method": "random" }, "limits": {"end": %d} }, "id": 1}' %self.LIMIT)
+        else:
+            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": { "properties": ["title", "playcount", "season", "episode", "showtitle", "plot", "fanart", "thumbnail", "file", "rating"], "sort": {"method": "random" }, "limits": {"end": %d} }, "id": 1}' %self.LIMIT)
+        json_response = unicode(json_query, 'utf-8', errors='ignore')
+        jsonobject = simplejson.loads(json_response)
+        if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('episodes'):
             count = 0
-            while count < self.LIMIT:
+            total = str( len( json_response ) )
+            for item in jsonobject['result']['episodes']:
                 count += 1
-                # check if we don't run out of items before LIMIT is reached
-                if len( json_response ) == 0:
-                    return
-                # select a random item
-                item = random.choice( json_response )
-                # remove the item from our list
-                json_response.remove( item )
-                # find values
-                if self.UNPLAYED == "True":
-                    playcount = item['playcount']
-                    if playcount > 0:
-                        count = count - 1
-                        continue
-                title = item['title']
-                showtitle = item['showtitle']
                 season = "%.2d" % float(item['season'])
                 episode = "%.2d" % float(item['episode'])
-                rating = str(round(float(item['rating']),1))
-                plot = item['plot']
-                path = item['file']
-                thumb = item['thumbnail']
-                fanart = item['fanart']
                 episodeno = "s%se%s" % ( season,  episode, )
                 # set our properties
-                self.WINDOW.setProperty( "RandomEpisode.%d.ShowTitle"     % ( count ), showtitle )
-                self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeTitle"  % ( count ), title )
+                self.WINDOW.setProperty( "RandomEpisode.%d.ShowTitle"     % ( count ), item['showtitle'] )
+                self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeTitle"  % ( count ), item['title'] )
                 self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeNo"     % ( count ), episodeno )
                 self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeSeason" % ( count ), season )
                 self.WINDOW.setProperty( "RandomEpisode.%d.EpisodeNumber" % ( count ), episode )
-                self.WINDOW.setProperty( "RandomEpisode.%d.Rating"        % ( count ), rating )
-                self.WINDOW.setProperty( "RandomEpisode.%d.Plot"          % ( count ), plot )
-                self.WINDOW.setProperty( "RandomEpisode.%d.Path"          % ( count ), path )
-                self.WINDOW.setProperty( "RandomEpisode.%d.Fanart"        % ( count ), fanart )
-                self.WINDOW.setProperty( "RandomEpisode.%d.Thumb"         % ( count ), thumb )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Rating"        % ( count ), str(round(float(item['rating']),1)) )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Plot"          % ( count ), item['plot'] )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Path"          % ( count ), item['file'] )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Fanart"        % ( count ), item['fanart'] )
+                self.WINDOW.setProperty( "RandomEpisode.%d.Thumb"         % ( count ), item['thumbnail'] )
                 self.WINDOW.setProperty( "RandomEpisode.Count"            , total )
 
     def _fetch_musicvideo_info( self ):
