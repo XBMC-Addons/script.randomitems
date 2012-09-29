@@ -12,7 +12,6 @@ import sys
 import os
 import random
 
-from elementtree import ElementTree as xmltree
 if sys.version_info < (2, 7):
     import simplejson
 else:
