@@ -232,58 +232,33 @@ class Main:
                 self.WINDOW.setProperty( "RandomSong.Count"     , total )
 
     def _fetch_addon_info( self ):
-        # initialize our list
-        addonlist = []
-        # list the contents of the addons folder
-        addonpath = xbmc.translatePath( 'special://home/addons/' )
-        addons = os.listdir(addonpath)
-        # find directories in the addons folder
-        for item in addons:
-            if os.path.isdir(os.path.join(addonpath, item)):
-                # find addon.xml in the addon folder
-                addonfile = os.path.join(addonpath, item, 'addon.xml')
-                if os.path.exists(addonfile):
-                    # find addon id
-                    try:
-                        addonfilecontents = xmltree.parse(addonfile).getroot()
-                    except:
-                        # don't error on invalid addon.xml files
-                        continue
-                    for element in addonfilecontents.getiterator():
-                       if element.tag == "addon":
-                           addonid = element.attrib.get('id')
-                       elif element.tag == "provides":
-                           addonprovides = element.text
-                    # find plugins and scripts
-                    try:
-                        addontype = xbmcaddon.Addon(id=addonid).getAddonInfo('type')
-                        if (addontype == 'xbmc.python.script') or (addontype == 'xbmc.python.pluginsource'):
-                            addonlist.append( (addonid, addonprovides) )
-                    except:
-                        pass
-        # get total value
-        total = str( len( addonlist ) )
-        # count thru our addons
-        count = 0
-        while count < self.LIMIT:
-            count += 1
-            # check if we don't run out of items before LIMIT is reached
-            if len(addonlist) == 0:
-                return
-            # select a random item
-            addonid = random.choice(addonlist)
-            # remove the item from our list
-            addonlist.remove(addonid)
-            # set properties
-            self.WINDOW.setProperty( "RandomAddon.%d.Name"    % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('name') )
-            self.WINDOW.setProperty( "RandomAddon.%d.Author"  % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('author') )
-            self.WINDOW.setProperty( "RandomAddon.%d.Summary" % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('summary') )
-            self.WINDOW.setProperty( "RandomAddon.%d.Version" % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('version') )
-            self.WINDOW.setProperty( "RandomAddon.%d.Path"    % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('id') )
-            self.WINDOW.setProperty( "RandomAddon.%d.Fanart"  % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('fanart') )
-            self.WINDOW.setProperty( "RandomAddon.%d.Thumb"   % ( count ), xbmcaddon.Addon(id=addonid[0]).getAddonInfo('icon') )
-            self.WINDOW.setProperty( "RandomAddon.%d.Type"    % ( count ), addonid[1] )
-            self.WINDOW.setProperty( "RandomAddon.Count"      , total )
+        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddons", "params": {"properties": ["name", "author", "summary", "version", "fanart", "thumbnail"]}, "id": 1}')
+        json_response = unicode(json_query, 'utf-8', errors='ignore')
+        jsonobject = simplejson.loads(json_response)
+        if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('addons'):
+            total = str( len( jsonobject ) )
+            # find plugins and scripts
+            addonlist = []
+            for item in jsonobject['result']['addons']:
+                if item['type'] == 'xbmc.python.script' or item['type'] == 'xbmc.python.pluginsource':
+                    addonlist.append(item)
+            # randomize the list
+            random.shuffle(addonlist)
+            count = 0
+            for item in addonlist:
+                count += 1
+                self.WINDOW.setProperty( "RandomAddon.%d.Name"    % ( count ), item['name'] )
+                self.WINDOW.setProperty( "RandomAddon.%d.Author"  % ( count ), item['author'] )
+                self.WINDOW.setProperty( "RandomAddon.%d.Summary" % ( count ), item['summary'] )
+                self.WINDOW.setProperty( "RandomAddon.%d.Version" % ( count ), item['version'] )
+                self.WINDOW.setProperty( "RandomAddon.%d.Path"    % ( count ), item['addonid'] )
+                self.WINDOW.setProperty( "RandomAddon.%d.Fanart"  % ( count ), item['fanart'] )
+                self.WINDOW.setProperty( "RandomAddon.%d.Thumb"   % ( count ), item['thumbnail'] )
+                self.WINDOW.setProperty( "RandomAddon.%d.Type"    % ( count ), item['type'] )
+                self.WINDOW.setProperty( "RandomAddon.Count"      , total )
+                # stop if we've reached the number of items we need
+                if count == self.LIMIT:
+                    break
 
 if ( __name__ == "__main__" ):
         log('script version %s started' % __addonversion__)
