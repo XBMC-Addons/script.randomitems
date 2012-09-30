@@ -159,7 +159,7 @@ class Main:
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.RunningTime" % ( count ), item['runtime'] )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Path"        % ( count ), item['file'] )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Fanart"      % ( count ), item['fanart'] )
-                self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), " / ".join( artist ) )
+                self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), " / ".join( item['artist'] ) )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Thumb"       % ( count ), item['thumbnail'] )
                 self.WINDOW.setProperty( "RandomMusicVideo.Count"          , total )
 
