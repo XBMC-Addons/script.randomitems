@@ -1,5 +1,6 @@
 v12.0.3
 - use json-rpc for random addons
+- remove the Random*.Count properties
 
 v12.0.2
 - fix potential unicode encode error

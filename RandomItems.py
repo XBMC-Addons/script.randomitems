@@ -30,11 +30,6 @@ class Main:
 
     def _clear_properties( self ):
         # reset totals property for visible condition
-        self.WINDOW.clearProperty( "RandomMovie.Count" )
-        self.WINDOW.clearProperty( "RandomEpisode.Count" )
-        self.WINDOW.clearProperty( "RandomMusicVideo.Count" )
-        self.WINDOW.clearProperty( "RandomSong.Count" )
-        self.WINDOW.clearProperty( "RandomAlbum.Count" )
         self.WINDOW.clearProperty( "RandomAddon.Count" )
         # we clear title for visible condition
         for count in range( self.LIMIT ):
@@ -96,7 +91,6 @@ class Main:
         json_response = simplejson.loads(json_query)
         if json_response.has_key('result') and json_response['result'] != None and json_response['result'].has_key('movies'):
             count = 0
-            total = str(len(json_response))
             for item in json_response['result']['movies']:
                 count += 1
                 # set our properties
@@ -109,7 +103,6 @@ class Main:
                 self.WINDOW.setProperty( "RandomMovie.%d.Trailer"     % ( count ), item['trailer'] )
                 self.WINDOW.setProperty( "RandomMovie.%d.Fanart"      % ( count ), item['fanart'] )
                 self.WINDOW.setProperty( "RandomMovie.%d.Thumb"       % ( count ), item['thumbnail'] )
-                self.WINDOW.setProperty( "RandomMovie.Count"          , total )
 
     def _fetch_episode_info( self ):
         if self.UNPLAYED == "True":
@@ -120,7 +113,6 @@ class Main:
         jsonobject = simplejson.loads(json_response)
         if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('episodes'):
             count = 0
-            total = str( len( json_response ) )
             for item in jsonobject['result']['episodes']:
                 count += 1
                 season = "%.2d" % float(item['season'])
@@ -137,7 +129,6 @@ class Main:
                 self.WINDOW.setProperty( "RandomEpisode.%d.Path"          % ( count ), item['file'] )
                 self.WINDOW.setProperty( "RandomEpisode.%d.Fanart"        % ( count ), item['fanart'] )
                 self.WINDOW.setProperty( "RandomEpisode.%d.Thumb"         % ( count ), item['thumbnail'] )
-                self.WINDOW.setProperty( "RandomEpisode.Count"            , total )
 
     def _fetch_musicvideo_info( self ):
         if self.UNPLAYED == "True":
@@ -149,7 +140,6 @@ class Main:
         json_response = simplejson.loads(json_query)
         if json_response.has_key('result') and json_response['result'] != None and json_response['result'].has_key('musicvideos'):
             count = 0
-            total = str(len(json_response))
             for item in json_response['result']['musicvideos']:
                 count += 1
                 # set our properties
@@ -161,7 +151,6 @@ class Main:
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Fanart"      % ( count ), item['fanart'] )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Artist"      % ( count ), " / ".join( item['artist'] ) )
                 self.WINDOW.setProperty( "RandomMusicVideo.%d.Thumb"       % ( count ), item['thumbnail'] )
-                self.WINDOW.setProperty( "RandomMusicVideo.Count"          , total )
 
     def _fetch_album_info( self ):
         if self.UNPLAYED == "True":
@@ -172,7 +161,6 @@ class Main:
         jsonobject = simplejson.loads(json_response)
         if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('albums'):
             count = 0
-            total = str(len(jsonobject))
             for item in jsonobject['result']['albums']:
                 count += 1
                 rating = str(item['rating'])
@@ -187,7 +175,6 @@ class Main:
                 self.WINDOW.setProperty( "RandomAlbum.%d.Fanart" % ( count ), item['fanart'] )
                 self.WINDOW.setProperty( "RandomAlbum.%d.Thumb"  % ( count ), item['thumbnail'] )
                 self.WINDOW.setProperty( "RandomAlbum.%d.Album_Description"  % ( count ), item['description'] )
-                self.WINDOW.setProperty( "RandomAlbum.Count"     , total )
 
     def _fetch_artist_info( self ):
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": {"properties": ["genre", "description", "fanart", "thumbnail"], "sort": {"method": "random"}, "limits": {"end": %d}}, "id": 1}'  %self.LIMIT)
@@ -195,7 +182,6 @@ class Main:
         jsonobject = simplejson.loads(json_response)
         if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('artists'):
             count = 0
-            total = str(len(jsonobject))
             for item in jsonobject['result']['artists']:
                 count += 1
                 path = 'musicdb://2/' + str(item['artistid']) + '/'
@@ -205,7 +191,6 @@ class Main:
                 self.WINDOW.setProperty( "RandomArtist.%d.Fanart" % ( count ), item['fanart'] )
                 self.WINDOW.setProperty( "RandomArtist.%d.Thumb"  % ( count ), item['thumbnail'] )
                 self.WINDOW.setProperty( "RandomArtist.%d.Artist_Description"  % ( count ), item['description'] )
-                self.WINDOW.setProperty( "RandomArtist.Count"     , total )
 
     def _fetch_song_info( self ):
         if self.UNPLAYED == "True":
@@ -216,7 +201,6 @@ class Main:
         jsonobject = simplejson.loads(json_response)
         if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('songs'):
             count = 0
-            total = str( len( jsonobject ) )
             for item in jsonobject['result']['songs']:
                 count += 1
                 self.WINDOW.setProperty( "RandomSong.%d.Title"  % ( count ), item['title'] )
@@ -227,14 +211,13 @@ class Main:
                 self.WINDOW.setProperty( "RandomSong.%d.Path"   % ( count ), item['file'] )
                 self.WINDOW.setProperty( "RandomSong.%d.Fanart" % ( count ), item['fanart'] )
                 self.WINDOW.setProperty( "RandomSong.%d.Thumb"  % ( count ), item['thumbnail'] )
-                self.WINDOW.setProperty( "RandomSong.Count"     , total )
 
     def _fetch_addon_info( self ):
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Addons.GetAddons", "params": {"properties": ["name", "author", "summary", "version", "fanart", "thumbnail"]}, "id": 1}')
         json_response = unicode(json_query, 'utf-8', errors='ignore')
         jsonobject = simplejson.loads(json_response)
         if jsonobject.has_key('result') and jsonobject['result'] != None and jsonobject['result'].has_key('addons'):
-            total = str( len( jsonobject ) )
+            total = str( len( jsonobject['result']['addons'] ) )
             # find plugins and scripts
             addonlist = []
             for item in jsonobject['result']['addons']:
