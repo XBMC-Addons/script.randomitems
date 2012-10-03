@@ -24,7 +24,6 @@ Labels:
 "RandomMovie.%d.Trailer"
 "RandomMovie.%d.Fanart"
 "RandomMovie.%d.Thumb"
-"RandomMovie.Count"
  
 "RandomEpisode.%d.ShowTitle"
 "RandomEpisode.%d.EpisodeTitle"
@@ -36,7 +35,6 @@ Labels:
 "RandomEpisode.%d.Path"
 "RandomEpisode.%d.Fanart"
 "RandomEpisode.%d.Thumb"
-"RandomEpisode.Count"
 
 "RandomMusicVideo.%d.Title"
 "RandomMusicVideo.%d.Year"
@@ -46,7 +44,6 @@ Labels:
 "RandomMusicVideo.%d.Artist"
 "RandomMusicVideo.%d.Fanart"
 "RandomMusicVideo.%d.Thumb"
-"RandomMusicVideo.Count"
 
 "RandomAlbum.%d.Title"
 "RandomAlbum.%d.Year"
@@ -56,7 +53,6 @@ Labels:
 "RandomAlbum.%d.Thumb"
 "RandomAlbum.%d.Rating"
 "RandomAlbum.%d.Album_Description"
-"RandomAlbum.Count"
 
 "RandomSong.%d.Title"
 "RandomSong.%d.Year"
@@ -66,7 +62,6 @@ Labels:
 "RandomSong.%d.Fanart"
 "RandomSong.%d.Thumb"
 "RandomSong.%d.Rating"
-"RandomSong.Count"
 
 "RandomAddon.%d.Name"
 "RandomAddon.%d.Author"
@@ -84,7 +79,6 @@ Labels:
 "RandomArtist.%d.Fanart"
 "RandomArtist.%d.Thumb"
 "RandomArtist.%d.Genre"
-"RandomArtist.Count"
 
 
 For more inforamtion and help please check:
