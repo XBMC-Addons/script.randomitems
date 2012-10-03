@@ -1,3 +1,6 @@
+v12.0.4
+- Bump miniumum XBMC version
+
 v12.0.3
 - use json-rpc for random addons
 - remove the Random*.Count properties
