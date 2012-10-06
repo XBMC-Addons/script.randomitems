@@ -25,21 +25,32 @@ def log(txt):
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
 class Main:
-    # grab the home window
-    WINDOW = xbmcgui.Window( 10000 )
-
-    def _clear_properties( self ):
-        # reset totals property for visible condition
-        self.WINDOW.clearProperty( "RandomAddon.Count" )
-        # we clear title for visible condition
-        for count in range( self.LIMIT ):
-            self.WINDOW.clearProperty( "RandomMovie.%d.Title"      % ( count + 1 ) )
-            self.WINDOW.clearProperty( "RandomEpisode.%d.Title"    % ( count + 1 ) )
-            self.WINDOW.clearProperty( "RandomMusicVideo.%d.Title" % ( count + 1 ) )
-            self.WINDOW.clearProperty( "RandomSong.%d.Title"       % ( count + 1 ) )
-            self.WINDOW.clearProperty( "RandomAlbum.%d.Title"      % ( count + 1 ) )
-            self.WINDOW.clearProperty( "RandomAddon.%d.Name"       % ( count + 1 ) )
-
+    def __init__( self ):
+        # parse argv for any preferences
+        self._parse_argv()
+        self._init_vars()
+        # check if we were executed internally
+        if self.ALBUMID:
+            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "albumid": %d } }, "id": 1 }' % int(self.ALBUMID))
+        else:
+            # clear our property, if another instance is already running it should stop now
+            self.WINDOW.clearProperty('RandomItems_Running_Running')
+            # clear properties
+            self._clear_properties()
+            # set any alarm
+            self._set_alarm()
+            # fetch media info
+            self._fetch_movie_info()
+            self._fetch_episode_info()
+            self._fetch_musicvideo_info()
+            self._fetch_album_info()
+            self._fetch_artist_info()
+            self._fetch_song_info()
+            self._fetch_addon_info()
+            xbmc.sleep(1000)
+            self.WINDOW.setProperty('RandomItems_Running', 'True')
+            self._daemon()
+            
     def _parse_argv( self ):
         try:
             # parse sys.argv for params
@@ -54,32 +65,29 @@ class Main:
         self.ALARM = int( params.get( "alarm", "0" ) )
         self.ALBUMID = params.get( "albumid", "" )
 
+    def _init_vars( self ):
+        self.WINDOW = xbmcgui.Window( 10000 )
+        self.Player = MyPlayer( action = self._update)
+        self.Monitor = MyMonitor(action = self._update)
+
+    def _clear_properties( self ):
+        # reset totals property for visible condition
+        self.WINDOW.clearProperty( "RandomAddon.Count" )
+        # we clear title for visible condition
+        for count in range( self.LIMIT ):
+            self.WINDOW.clearProperty( "RandomMovie.%d.Title"      % ( count + 1 ) )
+            self.WINDOW.clearProperty( "RandomEpisode.%d.Title"    % ( count + 1 ) )
+            self.WINDOW.clearProperty( "RandomMusicVideo.%d.Title" % ( count + 1 ) )
+            self.WINDOW.clearProperty( "RandomSong.%d.Title"       % ( count + 1 ) )
+            self.WINDOW.clearProperty( "RandomAlbum.%d.Title"      % ( count + 1 ) )
+            self.WINDOW.clearProperty( "RandomAddon.%d.Name"       % ( count + 1 ) )
+
     def _set_alarm( self ):
         # only run if user/skinner preference
         if ( not self.ALARM ): return
         # set the alarms command
         command = "XBMC.RunScript(%s,limit=%d&unplayed=%s&trailer=%s&alarm=%d)" % ( __addonid__, self.LIMIT, str( self.UNPLAYED ), str( self.PLAY_TRAILER ), self.ALARM, )
         xbmc.executebuiltin( "AlarmClock(RandomItems,%s,%d,true)" % ( command, self.ALARM, ) )
-
-    def __init__( self ):
-        # parse argv for any preferences
-        self._parse_argv()
-        # check if we were executed internally
-        if self.ALBUMID:
-            xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.Open", "params": { "item": { "albumid": %d } }, "id": 1 }' % int(self.ALBUMID))
-        else:
-            # clear properties
-            self._clear_properties()
-            # set any alarm
-            self._set_alarm()
-            # fetch media info
-            self._fetch_movie_info()
-            self._fetch_episode_info()
-            self._fetch_musicvideo_info()
-            self._fetch_album_info()
-            self._fetch_artist_info()
-            self._fetch_song_info()
-            self._fetch_addon_info()
 
     def _fetch_movie_info( self ):
         if self.UNPLAYED == "True":
@@ -241,6 +249,89 @@ class Main:
                 if count == self.LIMIT:
                     break
 
+    def _daemon( self ):
+        # keep running until xbmc exits or another instance is started
+        while (not xbmc.abortRequested) and self.WINDOW.getProperty('RandomItems_Running') == 'True':
+            xbmc.sleep(500)
+        if xbmc.abortRequested:
+            log('script stopped: xbmc quit')
+        else:
+            log('script stopped: new script instance started')
+
+    def _update( self, type):
+        xbmc.sleep(500)
+        if type == 'movie':
+            self._fetch_movies()
+        elif type == 'episode':
+            self._fetch_episode_info()
+        elif type == 'video':
+            self._fetch_movie_info()
+            self._fetch_episode_info()
+            self._fetch_musicvideo_info()
+        elif type == 'album' or type == 'music':
+            self._fetch_album_info()
+            self._fetch_artist_info()
+            self._fetch_song_info()
+
+class MyMonitor(xbmc.Monitor):
+    def __init__( self, *args, **kwargs ):
+        xbmc.Monitor.__init__( self )
+        self.action = kwargs['action']
+
+    def onDatabaseUpdated( self, database):
+        self.action(database)
+
+class MyPlayer(xbmc.Player):
+    def __init__( self, *args, **kwargs ):
+        xbmc.Player.__init__( self )
+        self.action = kwargs[ "action" ]
+        self.substrings = [ '-trailer', 'http://' ]
+
+    def onPlayBackStarted( self ):
+        xbmc.sleep(1000)
+        self.type = ""
+        # Set values based on the file content
+        if ( self.isPlayingAudio() ):
+            self.type = "album"  
+        else:
+            if xbmc.getCondVisibility( 'VideoPlayer.Content(movies)' ):
+                filename = ''
+                isMovie = True
+                try:
+                    filename = self.getPlayingFile()
+                except:
+                    pass
+                if filename != '':
+                    for string in self.substrings:
+                        if string in filename:
+                            isMovie = False
+                            break
+                if isMovie:
+                    self.type = "movie"
+            elif xbmc.getCondVisibility( 'VideoPlayer.Content(episodes)' ):
+                # Check for tv show title and season to make sure it's really an episode
+                if xbmc.getInfoLabel('VideoPlayer.Season') != "" and xbmc.getInfoLabel('VideoPlayer.TVShowTitle') != "":
+                    self.type = "episode"
+
+    def onPlayBackEnded( self ):
+        if self.type == 'movie':
+            self.action( 'movie')
+        elif self.type == 'episode':
+            self.action( 'episode')
+        elif self.type == 'album':
+            self.action('album')
+        self.type = ""
+        
+
+    def onPlayBackStopped( self ):
+        if self.type == 'movie':
+            self.action( 'movie')
+        elif self.type == 'episode':
+            self.action( 'episode')
+        elif self.type == 'album':
+            self.action( 'album')
+        self.type = ""
+                    
 if ( __name__ == "__main__" ):
         log('script version %s started' % __addonversion__)
         Main()
